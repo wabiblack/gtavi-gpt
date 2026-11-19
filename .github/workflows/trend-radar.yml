@@ -45,8 +45,8 @@ jobs:
 
       - name: Find trending videos
         env:
-          SEARCH_QUERY: ${{ inputs.query }}
-          SEARCH_HOURS: ${{ inputs.hours }}
+          SEARCH_QUERY: ${{ inputs.query || 'gta 6' }}
+          SEARCH_HOURS: ${{ inputs.hours || '168' }}
         run: |
           python scripts/trends.py --query "$SEARCH_QUERY" --hours "$SEARCH_HOURS" --limit 30 --out trends.md
 
