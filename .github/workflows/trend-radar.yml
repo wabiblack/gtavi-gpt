@@ -19,7 +19,7 @@ on:
           - "168"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   trends:
@@ -45,6 +45,18 @@ jobs:
           SEARCH_HOURS: ${{ inputs.hours }}
         run: |
           python scripts/trends.py --query "$SEARCH_QUERY" --hours "$SEARCH_HOURS" --limit 30 --out trends.md
+
+      - name: Publish readable report to repository
+        run: |
+          mkdir -p reports
+          cp trends.md reports/trends.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/trends.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Update GTA VI trend report"
+            git push
+          fi
 
       - name: Save trend report
         if: always()
