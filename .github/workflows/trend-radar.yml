@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/trend-radar.yml"
+      - "scripts/trends.py"
   workflow_dispatch:
     inputs:
       query:
