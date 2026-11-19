@@ -1,0 +1,56 @@
+name: GTA VI Trend Radar
+
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: "Search phrase for YouTube trends"
+        required: true
+        default: "gta 6"
+        type: string
+      hours:
+        description: "Look back this many hours"
+        required: true
+        default: "168"
+        type: choice
+        options:
+          - "24"
+          - "72"
+          - "168"
+
+permissions:
+  contents: read
+
+jobs:
+  trends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Find trending videos
+        env:
+          SEARCH_QUERY: ${{ inputs.query }}
+          SEARCH_HOURS: ${{ inputs.hours }}
+        run: |
+          python scripts/trends.py --query "$SEARCH_QUERY" --hours "$SEARCH_HOURS" --limit 30 --out trends.md
+
+      - name: Save trend report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta-vi-trends
+          path: trends.md
+          if-no-files-found: warn
+          retention-days: 3
